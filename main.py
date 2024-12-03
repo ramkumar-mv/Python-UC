@@ -8,9 +8,15 @@ import matplotlib.pyplot as plt
 #ingesting data from a CSV file
 data = pd.read_csv('data.csv')
 
+print("Initial Data:")
+print(data.head())
+
 #managing different data types
 data['date'] = pd.to_datetime(data['date'])
 data['category'] = data['category'].astype('category')
+data['value'] = pd.to_numeric(data['value'], errors='coerce') 
+data['value'].fillna(data['value'].mean(), inplace=True)
+
 
 #wrangling the data using filtering and grouping
 filtered_data = data[data['value'] > 10]
@@ -22,16 +28,31 @@ def analyse_data(df):
 
 #using a function for data analysis
 analysis_result = analyse_data(grouped_data)
-
-#visualizing the data using matplotlib
-plt.figure(figsize=(10, 6))
-plt.bar(grouped_data.index, grouped_data['value'], color='blue')
-plt.title('Value by Category')
-plt.xlabel('Category')
-plt.ylabel('Value')
-plt.xticks(rotation=45)
-plt.tight_layout()
-plt.show()
+print("\nAnalysis Result:")
 
 #printing the analysis result
 print(analysis_result)
+
+#visualizing the data using matplotlib - bar chart
+plt.figure(figsize=(12, 6))
+plt.bar(grouped_data.index, grouped_data['value'], color='skyblue')
+plt.title('Total Value by Category', fontsize=16)
+plt.xlabel('Category', fontsize=14)
+plt.ylabel('Total Value', fontsize=14)
+plt.xticks(rotation=45)
+plt.grid(axis='y', linestyle='--', alpha=0.7)
+plt.tight_layout()
+plt.savefig('bar_chart.png') 
+plt.show()
+
+#visualizing the data using matplotlib - pie chart
+plt.figure(figsize=(8, 8))
+plt.pie(grouped_data['value'], labels=grouped_data.index, autopct='%1.1f%%', startangle=140)
+plt.title('Category Distribution', fontsize=16)
+plt.axis('equal')  
+plt.savefig('pie_chart.png')
+plt.show()
+
+#saving the analysis result in text file for record-keeping
+with open('analysis_result.txt', 'w') as f:
+    f.write(str(analysis_result))
